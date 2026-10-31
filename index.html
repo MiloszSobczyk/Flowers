@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Dla Ciebie 🌸</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+  }
+
+  canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    cursor: default;
+  }
+
+  /* Compact top dock so the flowers are never covered */
+  .top-bar {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 100;
+    width: max-content;
+    max-width: 94vw;
+  }
+
+  .note-wrapper {
+    position: relative;
+  }
+
+  .cute-btn {
+    background: rgba(20, 15, 20, 0.82);
+    border: 1px solid rgba(235, 190, 175, 0.45);
+    color: #f7ede2;
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), 0 0 15px rgba(243, 154, 178, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+
+  .cute-btn:hover, .cute-btn:active {
+    background: rgba(243, 154, 178, 0.9);
+    color: #1a0910;
+    border-color: #ffe5ec;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 22px rgba(243, 154, 178, 0.4);
+  }
+
+  .pulse-icon {
+    display: inline-block;
+    animation: heartbeat 2.4s infinite ease-in-out;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.18) rotate(-5deg); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.12) rotate(5deg); }
+  }
+
+  /* Poetic popover card (fixed positioning & calc syntax for mobile) */
+  .note-card {
+    position: fixed;
+    top: 68px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px) scale(0.96);
+    width: calc(100vw - 32px);
+    max-width: 370px;
+    background: rgba(18, 13, 18, 0.94);
+    border: 1px solid rgba(235, 190, 175, 0.5);
+    border-radius: 18px;
+    padding: 1.5rem 1.6rem;
+    color: #f7ede2;
+    text-align: center;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), inset 0 0 24px rgba(243, 154, 178, 0.06);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 101;
+  }
+
+  /* Show on hover (desktop) OR when tapped (.open class on mobile) */
+  .note-wrapper:hover .note-card,
+  .note-wrapper.open .note-card {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+
+  .note-title {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #f4b8c8;
+    margin: 0 0 0.65rem 0;
+  }
+
+  .note-divider {
+    width: 48px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(244, 184, 200, 0.65), transparent);
+    margin: 0 auto 0.85rem auto;
+  }
+
+  .note-text {
+    margin: 0;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.24rem;
+    line-height: 1.55;
+    font-style: italic;
+    font-weight: 500;
+    color: #f7ede2;
+    letter-spacing: 0.01em;
+  }
+
+  .note-footer {
+    margin-top: 0.9rem;
+    font-size: 0.9rem;
+    color: rgba(244, 184, 200, 0.75);
+    letter-spacing: 0.2em;
+  }
+
+  @media (max-width: 400px) {
+    .cute-btn {
+      padding: 8px 14px;
+      font-size: 0.75rem;
+    }
+    .note-card {
+      padding: 1.25rem 1.3rem;
+    }
+    .note-text {
+      font-size: 1.15rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="note-wrapper" id="noteWrapper">
+    <button class="cute-btn" id="noteToggleBtn" type="button" aria-label="Pokaż wiadomość">
+      <span class="pulse-icon">💌</span> Dla Ciebie
+    </button>
+    <div class="note-card">
+      <div class="note-title">Moja Pani</div>
+      <div class="note-divider"></div>
+      <p class="note-text">
+        Żaden wicher ani odległość nie zmażą mej obietnicy. Choć dziś mogę posłać jedynie cień prawdziwych kwiatów, nie spocznę, póki nie zstąpię przed Tobą z żywym kwieciem.
+      </p>
+      <div class="note-footer">❦</div>
+    </div>
+  </div>
+
+  <button class="cute-btn" id="newBouquetBtn" type="button">
+    <span>🌸</span> Nowy bukiet
+  </button>
+</div>
+
+<canvas id="screen"></canvas>
+
+<script>
+  const noteWrapper = document.getElementById('noteWrapper');
+  const noteToggleBtn = document.getElementById('noteToggleBtn');
+
+  noteToggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    noteWrapper.classList.toggle('open');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!noteWrapper.contains(e.target)) {
+      noteWrapper.classList.remove('open');
+    }
+  });
+</script>
+<script src="bouquet.js"></script>
+</body>
+</html>
